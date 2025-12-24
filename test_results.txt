@@ -1,0 +1,65 @@
+
+============================================================
+MEGA-SENA HACKER - TESTE COMPLETO DE ENDPOINTS
+============================================================
+
+============================================================
+TEST: Health Check
+============================================================
+Status: 200
+✅ SUCESSO
+
+============================================================
+TEST: Último Sorteio
+============================================================
+Status: 200
+Concurso: 2954
+Números: [1, 9, 37, 39, 42, 44]
+✅ SUCESSO
+
+============================================================
+TEST: Análise Qui-Quadrado
+============================================================
+Status: 200
+Previsão: [15, 28, 41, 45, 48, 56]
+✅ SUCESSO
+
+============================================================
+TEST: Atratores de Lorenz
+============================================================
+❌ ERRO: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+
+⚠️  Análise Quântica pode demorar 30-60 segundos...
+
+============================================================
+TEST: Análise Quântica
+============================================================
+❌ ERRO: HTTPConnectionPool(host='localhost', port=5555): Max retries exceeded with url: /analise-quantica (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x101c1f6b0>: Failed to es
+
+⚠️  Previsão Combinada pode demorar 60-90 segundos...
+
+============================================================
+TEST: Previsão Combinada
+============================================================
+❌ ERRO: HTTPConnectionPool(host='localhost', port=5555): Max retries exceeded with url: /previsao (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x101c1fd40>: Failed to establish 
+
+============================================================
+TEST: Teste Cego (concurso 2500)
+============================================================
+❌ ERRO: HTTPConnectionPool(host='localhost', port=5555): Max retries exceeded with url: /teste-cego (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1004e6bd0>: Failed to establis
+
+============================================================
+RESUMO DOS TESTES
+============================================================
+health               : ✅ PASSOU
+ultimo_sorteio       : ✅ PASSOU
+qui_quadrado         : ✅ PASSOU
+lorenz               : ❌ FALHOU
+quantica             : ❌ FALHOU
+previsao             : ❌ FALHOU
+teste_cego           : ❌ FALHOU
+
+3/7 testes passaram
+
+⚠️  4 teste(s) falharam
+============================================================

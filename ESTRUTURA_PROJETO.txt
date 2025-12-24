@@ -1,0 +1,329 @@
+================================================================================
+                        MEGA-SENA HACKER
+                    Sistema de Análise Preditiva
+================================================================================
+
+📂 ESTRUTURA DO PROJETO
+--------------------------------------------------------------------------------
+
+Mega-Sena-Hacker/
+│
+├── 📱 APLICAÇÃO PRINCIPAL
+│   ├── app.py                      # API Flask com todos os endpoints
+│   ├── database.py                 # Conexão e queries PostgreSQL
+│   └── config.py                   # Configurações e variáveis de ambiente
+│
+├── 🔬 MÓDULOS DE ANÁLISE
+│   └── analyzers/
+│       ├── __init__.py
+│       ├── chi_square.py           # Análise Qui-Quadrado (χ²)
+│       ├── lorenz_attractor.py     # Atratores Estranhos de Lorenz
+│       └── quantum_analyzer.py     # Simulação Quântica (Qiskit)
+│
+├── 🐳 DEPLOY & CONTAINERIZAÇÃO
+│   ├── Dockerfile                  # Container Docker
+│   ├── docker-compose.yml          # Orquestração Docker
+│   └── .dockerignore               # Arquivos ignorados no build
+│
+├── ⚙️  CONFIGURAÇÃO
+│   ├── .env.example                # Template de variáveis de ambiente
+│   ├── .gitignore                  # Arquivos ignorados pelo Git
+│   └── requirements.txt            # Dependências Python
+│
+├── 🧪 TESTES & VALIDAÇÃO
+│   ├── test_local.py               # Suite de testes interativos
+│   └── check_setup.py              # Validação de ambiente
+│
+├── 📚 DOCUMENTAÇÃO
+│   ├── README.md                   # Documentação completa
+│   ├── QUICKSTART.md               # Guia de início rápido
+│   ├── GITHUB_SETUP.md             # Setup do repositório GitHub
+│   ├── N8N_INTEGRATION.md          # Integração com n8n
+│   └── ESTRUTURA_PROJETO.txt       # Este arquivo
+│
+├── 🚀 SCRIPTS AUXILIARES
+│   └── run_local.sh                # Script de execução local
+│
+└── 📄 LEGAL
+    └── LICENSE                     # Licença MIT
+
+================================================================================
+🔌 ENDPOINTS DA API
+================================================================================
+
+Health Check:
+  GET  /health                      → Status da aplicação
+
+Consultas:
+  GET  /resultado-ultimo-sorteio    → Último resultado da Mega-Sena
+
+Análises Individuais:
+  GET  /analise-qui-quadrado        → Análise estatística χ²
+  GET  /atratores-de-lorenz         → Análise caótica + visualização
+  GET  /analise-quantica            → Simulação quântica Qiskit
+
+Previsões:
+  GET  /previsao                    → Previsão combinada (todos métodos)
+
+Validação:
+  POST /teste-cego                  → Teste de validação preditiva
+       Body: {"concurso_limite": N}
+
+================================================================================
+🎯 TRIGGERS N8N
+================================================================================
+
+Palavra-chave exata              Endpoint chamado
+--------------------------------------------------------------------------------
+"Resultado do último sorteio" → /resultado-ultimo-sorteio
+"Análise Qui-Quadrado"        → /analise-qui-quadrado
+"Atratores de Lorenz"         → /atratores-de-lorenz
+"Análise quântica"            → /analise-quantica
+"Previsão"                    → /previsao
+
+================================================================================
+🗄️  BANCO DE DADOS
+================================================================================
+
+Servidor:     utils_postgress (EasyPanel/Hostinger)
+Database:     utils
+Schema:       Mega-Sena-4
+Tabela:       resultados
+
+Estrutura da tabela:
+  - concurso (INTEGER, PK)
+  - data (DATE)
+  - bola1 a bola6 (INTEGER)
+
+================================================================================
+🔬 MÉTODOS DE ANÁLISE
+================================================================================
+
+1. QUI-QUADRADO (χ²)
+   - Análise de frequência dos números
+   - Teste de distribuição uniforme
+   - Identificação de números "quentes" e "frios"
+   - Estratégia de compensação estatística
+
+2. ATRATORES DE LORENZ
+   - Mapeamento temporal em espaço 3D
+   - Sistema caótico de Lorenz
+   - Identificação de padrões emergentes
+   - Visualização em diagrama de atratores
+   - Projeção de trajetórias futuras
+
+3. SIMULAÇÃO QUÂNTICA
+   - Circuitos quânticos com 6 qubits
+   - Superposição quântica (Hadamard gates)
+   - Entrelaçamento (CNOT gates)
+   - Transformada de Fourier Quântica (QFT)
+   - Medições probabilísticas
+
+================================================================================
+📋 FASE 1: TESTES CEGOS
+================================================================================
+
+Objetivo: Validar precisão das previsões com dados históricos
+
+Metodologia:
+  1. Dividir base de dados (ex: 2900 concursos)
+  2. Treinar com subset (ex: concursos 1-2000)
+  3. Prever próximo concurso (2001)
+  4. Comparar com resultado real
+  5. Calcular taxa de acerto
+  6. Refinar métodos
+
+Execução:
+  python test_local.py → Opção 7
+  ou
+  POST /teste-cego {"concurso_limite": 2000}
+
+================================================================================
+🚀 COMANDOS RÁPIDOS
+================================================================================
+
+Verificar ambiente:
+  python check_setup.py
+
+Executar localmente:
+  ./run_local.sh
+  ou
+  python app.py
+
+Testar API:
+  python test_local.py
+
+Build Docker:
+  docker build -t mega-sena-hacker .
+
+Run Docker:
+  docker-compose up -d
+
+Parar Docker:
+  docker-compose down
+
+================================================================================
+📦 DEPENDÊNCIAS PRINCIPAIS
+================================================================================
+
+Framework:
+  - Flask 3.0.0                     # API REST
+  - Gunicorn 21.2.0                 # WSGI Server
+
+Banco de Dados:
+  - psycopg2-binary 2.9.9           # PostgreSQL adapter
+
+Científicas:
+  - NumPy 1.26.2                    # Computação numérica
+  - SciPy 1.11.4                    # Algoritmos científicos
+  - Pandas 2.1.4                    # Análise de dados
+
+Visualização:
+  - Matplotlib 3.8.2                # Gráficos e plots
+
+Computação Quântica:
+  - Qiskit 0.45.1                   # Framework quântico IBM
+  - Qiskit-Aer 0.13.1               # Simulador quântico
+
+Utilitários:
+  - python-dotenv 1.0.0             # Variáveis de ambiente
+
+================================================================================
+🔐 SEGURANÇA
+================================================================================
+
+Credenciais:
+  ✅ Arquivo .env NÃO é commitado (está no .gitignore)
+  ✅ Usar .env.example como template
+  ✅ No deploy, configurar variáveis no painel do EasyPanel
+
+Secrets no GitHub (se usar CI/CD):
+  - DB_USER
+  - DB_PASSWORD
+  - DB_HOST
+  - DB_PORT
+  - DB_NAME
+  - DB_SCHEMA
+
+================================================================================
+🌐 DEPLOY
+================================================================================
+
+Local:
+  1. cp .env.example .env
+  2. ./run_local.sh
+  3. http://localhost:5000
+
+Docker:
+  1. docker-compose up -d
+  2. http://localhost:5000
+
+EasyPanel:
+  1. Push para GitHub
+  2. EasyPanel → GitHub App
+  3. Selecionar repositório
+  4. Configurar variáveis de ambiente
+  5. Deploy automático
+
+================================================================================
+📊 FLUXO DE DADOS
+================================================================================
+
+                              ┌─────────────┐
+                              │  PostgreSQL │
+                              │   (Hostinger)│
+                              └──────┬──────┘
+                                     │
+                                     ▼
+                              ┌─────────────┐
+                              │  Database   │
+                              │   Module    │
+                              └──────┬──────┘
+                                     │
+                    ┌────────────────┼────────────────┐
+                    ▼                ▼                ▼
+            ┌──────────────┐ ┌──────────────┐ ┌──────────────┐
+            │ Chi-Square   │ │   Lorenz     │ │   Quantum    │
+            │   Analyzer   │ │  Attractor   │ │   Analyzer   │
+            └──────┬───────┘ └──────┬───────┘ └──────┬───────┘
+                   │                │                │
+                   └────────────────┼────────────────┘
+                                    ▼
+                             ┌─────────────┐
+                             │  Flask API  │
+                             │  (Endpoints)│
+                             └──────┬──────┘
+                                    │
+                    ┌───────────────┼───────────────┐
+                    ▼               ▼               ▼
+              ┌──────────┐   ┌──────────┐   ┌──────────┐
+              │   n8n    │   │  cURL    │   │  Browser │
+              │ Workflow │   │  Request │   │  Client  │
+              └──────────┘   └──────────┘   └──────────┘
+
+================================================================================
+📈 ROADMAP
+================================================================================
+
+✅ Fase 1: Desenvolvimento e Testes Locais
+   ✅ Implementação dos 3 métodos de análise
+   ✅ API REST completa
+   ✅ Sistema de testes cegos
+   ✅ Documentação
+   ⏳ Refinamento baseado em testes
+
+⏳ Fase 2: Validação e Otimização
+   ⏳ Testes com múltiplos cenários
+   ⏳ Comparação de performance entre métodos
+   ⏳ Ajustes de parâmetros
+   ⏳ Documentação de resultados
+
+⏳ Fase 3: Deploy e Integração
+   ⏳ Push para GitHub
+   ⏳ Deploy no EasyPanel
+   ⏳ Configuração workflows n8n
+   ⏳ Monitoramento e logs
+
+================================================================================
+💡 DICAS
+================================================================================
+
+Performance:
+  - Análise Qui-Quadrado: ~1-2 segundos
+  - Atratores de Lorenz: ~3-5 segundos
+  - Análise Quântica: ~10-30 segundos
+  - Previsão Combinada: ~15-40 segundos
+
+Otimização:
+  - Use /previsao para melhor resultado geral
+  - Teste cego recomendado: concurso_limite entre 2000-2500
+  - Para produção: considere cache de resultados
+
+Troubleshooting:
+  - Sempre execute check_setup.py primeiro
+  - Logs da aplicação ajudam no debug
+  - Teste conexão com banco separadamente
+
+================================================================================
+📞 CONTATO & SUPORTE
+================================================================================
+
+Desenvolvedor: alebrotto
+GitHub: https://github.com/alebrotto
+Projeto: Mega-Sena-Hacker
+
+Documentação completa: README.md
+Quick Start: QUICKSTART.md
+Issues/Bugs: GitHub Issues
+
+================================================================================
+⚖️  LICENÇA
+================================================================================
+
+MIT License - Uso livre para fins educacionais e de pesquisa.
+
+DISCLAIMER: Este projeto é apenas para fins educacionais e de pesquisa.
+Loterias são jogos de azar e não existe método científico que possa
+garantir previsões precisas. Use por sua conta e risco.
+
+================================================================================
