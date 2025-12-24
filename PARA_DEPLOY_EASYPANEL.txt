@@ -1,0 +1,208 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║                                                                            ║
+║                    MEGA-SENA HACKER - DEPLOY EASYPANEL                     ║
+║                                                                            ║
+║                      ✅ PRONTO PARA DEPLOY                                 ║
+║                                                                            ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+═══════════════════════════════════════════════════════════════════════════
+
+📦 1. REPOSITÓRIO GITHUB
+
+   URL: https://github.com/brotto/Mega-Sena-Hacker
+   
+   Visibilidade: 🔒 PRIVADO
+   
+   Owner: brotto
+   Nome: Mega-Sena-Hacker
+
+═══════════════════════════════════════════════════════════════════════════
+
+⚙️  2. VARIÁVEIS DE AMBIENTE (COPIAR E COLAR NO EASYPANEL)
+
+DB_USER=alebrotto
+DB_PASSWORD=BrottoK@was0975
+DB_HOST=utils_postgress
+DB_PORT=5432
+DB_NAME=utils
+DB_SCHEMA=public
+DB_TABLE=megasena
+PORT=5555
+DEBUG=False
+
+═══════════════════════════════════════════════════════════════════════════
+
+🌿 3. BRANCH
+
+main
+
+═══════════════════════════════════════════════════════════════════════════
+
+📁 4. CAMINHO DE BUILD
+
+/
+
+(Deixe em branco ou use "/" - raiz do projeto)
+
+═══════════════════════════════════════════════════════════════════════════
+
+🔌 5. PORTA
+
+5555
+
+═══════════════════════════════════════════════════════════════════════════
+
+🐳 CONFIGURAÇÃO DOCKER
+
+   ✅ Dockerfile já configurado
+   ✅ Build Method: Dockerfile
+   ✅ Dockerfile Path: ./Dockerfile
+   ✅ Port: 5555
+
+═══════════════════════════════════════════════════════════════════════════
+
+🌐 REDE DOCKER
+
+   ⚠️  IMPORTANTE: Selecionar a mesma rede do PostgreSQL!
+   
+   Nome da rede: (mesma que utils_postgress)
+   
+   Isso permite comunicação interna entre containers.
+
+═══════════════════════════════════════════════════════════════════════════
+
+📋 PASSO A PASSO NO EASYPANEL
+
+   1. Login no EasyPanel
+   
+   2. Create → GitHub App
+   
+   3. Autorizar GitHub (se necessário)
+   
+   4. Selecionar repositório: brotto/Mega-Sena-Hacker
+   
+   5. Configurar:
+      - Branch: main
+      - Build Method: Dockerfile
+      - Port: 5555
+   
+   6. Adicionar Variáveis de Ambiente (copiar do item 2)
+   
+   7. Configurar Rede Docker (mesma do PostgreSQL)
+   
+   8. Deploy!
+   
+   9. Aguardar build (~3-5 minutos)
+   
+   10. Verificar logs
+
+═══════════════════════════════════════════════════════════════════════════
+
+✅ VERIFICAÇÃO PÓS-DEPLOY
+
+   Health Check:
+   curl https://SEU_APP.easypanel.host/health
+   
+   Deve retornar:
+   {"status":"healthy","service":"Mega-Sena Hacker API"}
+   
+   Último Sorteio:
+   curl https://SEU_APP.easypanel.host/resultado-ultimo-sorteio
+   
+   Deve retornar dados do último concurso.
+
+═══════════════════════════════════════════════════════════════════════════
+
+📊 ENDPOINTS DISPONÍVEIS
+
+   GET  /health                       - Status da API
+   GET  /resultado-ultimo-sorteio     - Último resultado
+   GET  /analise-qui-quadrado          - Análise estatística
+   GET  /atratores-de-lorenz           - Análise caótica + gráfico
+   GET  /analise-quantica              - Simulação quântica
+   GET  /previsao                      - Previsão combinada ⭐
+   POST /teste-cego                    - Validação preditiva
+
+═══════════════════════════════════════════════════════════════════════════
+
+⏱️  PERFORMANCE ESPERADA
+
+   /health                      < 1s
+   /resultado-ultimo-sorteio    < 1s
+   /analise-qui-quadrado        5-10s
+   /atratores-de-lorenz         5-8s
+   /analise-quantica            30-45s
+   /previsao                    60-90s
+   /teste-cego                  60-90s
+
+═══════════════════════════════════════════════════════════════════════════
+
+⚠️  DIFERENÇAS LOCAL VS PRODUÇÃO
+
+   Configuração     | Local              | Produção (EasyPanel)
+   -----------------|--------------------|---------------------
+   DB_HOST          | 31.97.172.217      | utils_postgress
+   Acesso ao DB     | IP público         | Rede Docker interna
+   Porta            | 5555               | 5555
+
+═══════════════════════════════════════════════════════════════════════════
+
+🔧 TROUBLESHOOTING
+
+   ❌ "Connection refused" ao banco:
+      → Verificar DB_HOST=utils_postgress (não IP)
+      → Confirmar mesma rede Docker
+      → Verificar PostgreSQL rodando
+   
+   ❌ Build falha:
+      → Qiskit demora 5-10 min (normal)
+      → Verificar logs do build
+      → Tentar rebuild
+   
+   ❌ App não inicia:
+      → Verificar logs da aplicação
+      → Confirmar todas variáveis de ambiente
+      → Verificar porta 5555
+
+═══════════════════════════════════════════════════════════════════════════
+
+📚 DOCUMENTAÇÃO COMPLETA
+
+   Ver arquivo: INSTRUCOES_DEPLOY.md
+   
+   Outros docs importantes:
+   - TESTES_COMPLETOS.md
+   - ANALISE_QUANTICA_DETALHADA.md
+   - N8N_INTEGRATION.md
+   - README.md
+
+═══════════════════════════════════════════════════════════════════════════
+
+✅ CHECKLIST
+
+   [ ] Repositório GitHub acessível
+   [ ] App criado no EasyPanel
+   [ ] Variáveis de ambiente configuradas
+   [ ] Rede Docker configurada
+   [ ] Build concluído
+   [ ] /health respondendo
+   [ ] /resultado-ultimo-sorteio funcionando
+   [ ] Logs sem erros
+
+═══════════════════════════════════════════════════════════════════════════
+
+🎉 APÓS DEPLOY
+
+   1. Anotar URL pública do EasyPanel
+   2. Testar todos os endpoints
+   3. Configurar workflows n8n
+   4. Monitorar logs
+
+═══════════════════════════════════════════════════════════════════════════
+
+   Repositório: https://github.com/brotto/Mega-Sena-Hacker
+   
+   Status: ✅ PRONTO PARA DEPLOY!
+
+═══════════════════════════════════════════════════════════════════════════
