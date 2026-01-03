@@ -31,9 +31,10 @@ def get_analyzer_with_data():
 
     try:
         # Buscar TODOS os resultados do banco (ordenados por concurso)
+        # IMPORTANTE: Filtrar concurso > 0 para remover dados de lixo
         schema = config.DB_SCHEMA
         table = config.DB_TABLE
-        query = f'SELECT * FROM "{schema}".{table} ORDER BY concurso'
+        query = f'SELECT * FROM "{schema}".{table} WHERE concurso > 0 ORDER BY concurso'
         results = db.execute_query(query)
 
         if not results:
