@@ -3,11 +3,16 @@ from database import Database
 from analyzers.chi_square import ChiSquareAnalyzer
 from analyzers.lorenz_attractor import LorenzAttractorAnalyzer
 from analyzers.quantum_analyzer import QuantumAnalyzer
+from analyzers.prng_detector import PRNGDetector
 from config import Config
 from utils import convert_to_native_types
 import base64
 from io import BytesIO
 import logging
+
+# === NOVOS IMPORTS v2.0 ===
+import sys
+sys.path.insert(0, '/app')
 
 app = Flask(__name__)
 config = Config()
@@ -331,6 +336,131 @@ def teste_cego():
     except Exception as e:
         logger.error(f"Erro em teste_cego: {str(e)}")
         return jsonify({'error': str(e)}), 500
+
+
+@app.route('/analise-prng-rng', methods=['GET', 'POST'])
+def analise_prng_rng():
+    """
+    Endpoint: 'Análise PRNG vs RNG'
+    Detecta características de pseudo-aleatoriedade vs aleatoriedade verdadeira
+    """
+    try:
+        results = get_results_data()
+
+        if not results:
+            return jsonify({'error': 'Nenhum dado disponível'}), 404
+
+        # Criar detector PRNG
+        detector = PRNGDetector("Mega-Sena Brasil")
+        detector.load_from_database_results(results)
+
+        # Análise rápida
+        quick_result = detector.quick_analysis(n_possible=60)
+
+        response = {
+            'metodo': 'Detecção PRNG vs RNG',
+            'loteria': 'Mega-Sena Brasil',
+            'classificacao': quick_result['classification'],
+            'confianca': f"{quick_result['confidence']}%",
+            'total_concursos_analisados': quick_result['total_draws_analyzed'],
+            'indicadores': {
+                'chi_quadrado': {
+                    'p_value': quick_result['chi_square_p_value'],
+                    'nivel_suspeita': quick_result['suspect_indicators']['chi_square']
+                },
+                'teste_runs': {
+                    'z_score': quick_result['runs_z_score'],
+                    'nivel_suspeita': quick_result['suspect_indicators']['runs_test']
+                }
+            },
+            'descricao': 'Análise estatística para detectar padrões de equalização artificial (PRNG) vs aleatoriedade verdadeira (RNG)'
+        }
+
+        return jsonify(convert_to_native_types(response)), 200
+
+    except Exception as e:
+        logger.error(f"Erro em analise_prng_rng: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/analise-prng-completa', methods=['GET', 'POST'])
+def analise_prng_completa():
+    """
+    Endpoint: 'Análise PRNG Completa'
+    Executa todos os testes estatísticos para detecção de PRNG
+    """
+    try:
+        results = get_results_data()
+
+        if not results:
+            return jsonify({'error': 'Nenhum dado disponível'}), 404
+
+        # Criar detector PRNG
+        detector = PRNGDetector("Mega-Sena Brasil")
+        detector.load_from_database_results(results)
+
+        # Análise completa
+        complete_result = detector.analyze_complete(n_possible=60)
+
+        response = {
+            'metodo': 'Análise PRNG Completa',
+            'loteria': 'Mega-Sena Brasil',
+            'total_concursos': len(results),
+            'testes': convert_to_native_types(complete_result),
+            'descricao': 'Análise estatística completa com 4 testes: Chi-Quadrado, Runs Test, Velocidade de Cobertura e Coeficiente de Variação'
+        }
+
+        return jsonify(response), 200
+
+    except Exception as e:
+        logger.error(f"Erro em analise_prng_completa: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/estatisticas-distribuicao', methods=['GET', 'POST'])
+def estatisticas_distribuicao():
+    """
+    Endpoint: 'Estatísticas de Distribuição'
+    Retorna estatísticas sobre a distribuição dos números
+    """
+    try:
+        results = get_results_data()
+
+        if not results:
+            return jsonify({'error': 'Nenhum dado disponível'}), 404
+
+        # Criar detector PRNG
+        detector = PRNGDetector("Mega-Sena Brasil")
+        detector.load_from_database_results(results)
+
+        # Obter estatísticas
+        stats = detector.get_statistics_summary()
+
+        response = {
+            'metodo': 'Estatísticas de Distribuição',
+            'total_sorteios': stats['total_draws'],
+            'total_numeros_sorteados': stats['total_numbers_drawn'],
+            'frequencia_media': stats['mean_frequency'],
+            'desvio_padrao': stats['std_frequency'],
+            'coeficiente_variacao': f"{stats['cv_frequency']:.2f}%",
+            'numeros_mais_sorteados': convert_to_native_types(stats['most_common']),
+            'numeros_menos_sorteados': convert_to_native_types(stats['least_common']),
+            'descricao': 'Estatísticas descritivas da distribuição de frequências dos números sorteados'
+        }
+
+        return jsonify(response), 200
+
+    except Exception as e:
+        logger.error(f"Erro em estatisticas_distribuicao: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+
+# ==========================================
+# REGISTRAR ENDPOINTS v2.0
+# ==========================================
+from app_v2_endpoints import register_v2_routes
+register_v2_routes(app)
+logger.info("✅ Endpoints v2.0 carregados")
 
 
 if __name__ == '__main__':

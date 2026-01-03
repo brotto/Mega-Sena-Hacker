@@ -1,28 +1,30 @@
+# Python
 __pycache__/
 *.py[cod]
-*$py.class
 *.so
-.Python
-env/
-venv/
-ENV/
-.venv
-pip-log.txt
-pip-delete-this-directory.txt
-.env
-*.log
-.DS_Store
-*.sqlite3
-instance/
-.pytest_cache/
-.coverage
-htmlcov/
-dist/
-build/
 *.egg-info/
-.idea/
+venv/
+env/
+
+# IDEs
 .vscode/
-*.swp
-*.swo
+.idea/
+
+# OS
+.DS_Store
+.env
+
+# Dados sensíveis
+*.xlsx
+*.csv
+data/
+!data/.gitkeep
+
+# Outputs
 plots/
+outputs/
 *.png
+*.pdf
+
+# Logs
+*.log
