@@ -14,18 +14,31 @@ Este projeto combina análises estatísticas, teoria do caos e simulação quân
 
 ## 🔬 Métodos de Análise
 
-### 1. Qui-Quadrado (χ²)
+### Análises Preditivas
+
+#### 1. Qui-Quadrado (χ²)
 Análise estatística de frequência dos números sorteados para identificar padrões de distribuição e números "quentes" e "frios".
 
-### 2. Atratores Estranhos (Lorenz)
+#### 2. Atratores Estranhos (Lorenz)
 Utiliza a teoria do caos e atratores de Lorenz para mapear a sequência temporal dos sorteios em um espaço tridimensional, identificando padrões caóticos.
 
-### 3. Computação Quântica (Simulada)
+#### 3. Computação Quântica (Simulada)
 Emprega simulação quântica usando Qiskit para explorar superposição, entrelaçamento e interferência quântica na geração de previsões.
+
+### Análises de Aleatoriedade (PRNG vs RNG) ⭐ NOVO
+
+#### 4. Detector PRNG/RNG
+Sistema avançado para detectar características de pseudo-aleatoriedade (PRNG) vs aleatoriedade verdadeira (RNG) usando múltiplos testes estatísticos:
+- **Teste Chi-Quadrado**: Verifica uniformidade da distribuição
+- **Teste de Runs (Wald-Wolfowitz)**: Detecta agrupamento não-aleatório
+- **Velocidade de Cobertura**: Analisa rapidez de cobertura de todos os números
+- **Coeficiente de Variação**: Monitora estabilidade temporal
 
 ## 🚀 Funcionalidades
 
 ### Endpoints da API
+
+#### Endpoints de Previsão
 
 | Trigger | Endpoint | Descrição |
 |---------|----------|-----------|
@@ -34,6 +47,15 @@ Emprega simulação quântica usando Qiskit para explorar superposição, entrel
 | "Atratores de Lorenz" | `/atratores-de-lorenz` | Análise caótica + visualização 3D |
 | "Análise quântica" | `/analise-quantica` | Simulação quântica com Qiskit |
 | "Previsão" | `/previsao` | Previsão combinada (todos os métodos) |
+| "Teste cego" | `/teste-cego` | Teste de previsão com dados históricos |
+
+#### Endpoints de Análise PRNG/RNG ⭐ NOVO
+
+| Trigger | Endpoint | Descrição |
+|---------|----------|-----------|
+| "Análise PRNG vs RNG" | `/analise-prng-rng` | Detecta padrões de pseudo-aleatoriedade |
+| "Análise PRNG Completa" | `/analise-prng-completa` | Análise completa com todos os testes estatísticos |
+| "Estatísticas de Distribuição" | `/estatisticas-distribuicao` | Estatísticas descritivas das frequências |
 
 ## 📦 Instalação
 
@@ -200,6 +222,39 @@ curl http://localhost:5000/atratores-de-lorenz
 ```
 
 A resposta inclui uma imagem PNG em base64 do diagrama 3D.
+
+### Exemplo: Análise PRNG vs RNG ⭐ NOVO
+
+```bash
+curl http://localhost:5000/analise-prng-rng
+```
+
+**Resposta:**
+```json
+{
+  "classificacao": "PRNG (Pseudo-Aleatório)",
+  "confianca": "80%",
+  "total_concursos_analisados": 3274,
+  "indicadores": {
+    "chi_quadrado": {
+      "p_value": 0.04,
+      "nivel_suspeita": "MODERADO"
+    },
+    "teste_runs": {
+      "z_score": -46.2,
+      "nivel_suspeita": "CRÍTICO"
+    }
+  }
+}
+```
+
+### Exemplo: Estatísticas de Distribuição
+
+```bash
+curl http://localhost:5000/estatisticas-distribuicao
+```
+
+Retorna frequências dos números mais e menos sorteados, coeficiente de variação e outras métricas estatísticas.
 
 ## 🚢 Deploy no EasyPanel
 

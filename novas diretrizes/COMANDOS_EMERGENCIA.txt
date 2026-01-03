@@ -1,0 +1,248 @@
+# ========================================================================
+# COMANDOS DE EMERGÊNCIA - MIGRAÇÃO MEGA ANALYZER
+# ========================================================================
+# Use estes comandos se algo der errado durante a migração
+# ========================================================================
+
+# ========================================================================
+# 1. RESTAURAR DO BACKUP
+# ========================================================================
+
+# Remover tentativa falha
+rm -rf /Users/alebrotto/Mega-Sena-Hacker
+
+# Restaurar backup (ajustar data/hora)
+cp -r /Users/alebrotto/Mega-Sena-Hacker.backup.20250102_* /Users/alebrotto/Mega-Sena-Hacker
+
+# Verificar
+cd /Users/alebrotto/Mega-Sena-Hacker
+git status
+
+# ========================================================================
+# 2. MIGRAÇÃO MANUAL COMPLETA (SE CLAUDE CODE FALHAR)
+# ========================================================================
+
+# Backup
+cd /Users/alebrotto
+cp -r Mega-Sena-Hacker Mega-Sena-Hacker.backup.$(date +%Y%m%d_%H%M%S)
+
+# Entrar no projeto
+cd Mega-Sena-Hacker
+
+# Branch de backup
+git checkout -b v1-backup
+git add -A
+git commit -m "Backup antes migração v2.0"
+git checkout main
+
+# Limpar (MANTER .git)
+find . -maxdepth 1 ! -name '.git' ! -name '.' ! -name '..' -exec rm -rf {} +
+
+# Copiar novos arquivos
+cp -r ~/Downloads/mega_analyzer/* .
+cp ~/Downloads/mega_analyzer/.gitignore .
+
+# Permissões
+chmod +x migrar_projeto.sh
+
+# Instalar
+pip3 install -r requirements.txt --break-system-packages
+
+# Commit
+git add .
+git commit -m "🎲 Mega Analyzer v2.0 - Reescrita completa"
+
+# ========================================================================
+# 3. VERIFICAR ESTADO ATUAL
+# ========================================================================
+
+cd /Users/alebrotto/Mega-Sena-Hacker
+
+# Ver estrutura
+ls -la
+
+# Ver Git
+git status
+git log --oneline -5
+git branch -a
+
+# Ver backup
+ls -la /Users/alebrotto/ | grep Mega
+
+# ========================================================================
+# 4. TESTAR INSTALAÇÃO
+# ========================================================================
+
+cd /Users/alebrotto/Mega-Sena-Hacker
+
+# Teste imports
+python3 -c "from lottery_analyzer import LotteryAnalyzer; print('✅ OK')"
+
+# Teste exemplo completo
+python3 exemplo_analise_completa.py
+
+# Teste Mega Virada
+python3 analise_mega_virada_2025.py
+
+# ========================================================================
+# 5. REINSTALAR DEPENDÊNCIAS
+# ========================================================================
+
+cd /Users/alebrotto/Mega-Sena-Hacker
+
+# Atualizar pip
+pip3 install --upgrade pip
+
+# Instalar requirements
+pip3 install -r requirements.txt --break-system-packages
+
+# Ou instalar uma por uma
+pip3 install pandas --break-system-packages
+pip3 install numpy --break-system-packages
+pip3 install scipy --break-system-packages
+pip3 install matplotlib --break-system-packages
+pip3 install seaborn --break-system-packages
+pip3 install openpyxl --break-system-packages
+
+# ========================================================================
+# 6. CORRIGIR PERMISSÕES
+# ========================================================================
+
+cd /Users/alebrotto/Mega-Sena-Hacker
+
+# Arquivos
+chmod 644 *.py *.md *.txt
+chmod 755 *.sh
+
+# Diretórios
+sudo chmod -R 755 .
+
+# ========================================================================
+# 7. GIT - RESOLVER PROBLEMAS
+# ========================================================================
+
+cd /Users/alebrotto/Mega-Sena-Hacker
+
+# Desfazer último commit (se errou)
+git reset --soft HEAD~1
+
+# Desfazer mudanças não comitadas
+git checkout -- .
+
+# Ver diferenças
+git diff v1-backup main
+
+# Voltar para versão anterior
+git checkout v1-backup
+
+# Voltar para main
+git checkout main
+
+# Forçar push (CUIDADO!)
+git push origin main --force
+
+# ========================================================================
+# 8. LIMPAR E RECOMEÇAR
+# ========================================================================
+
+cd /Users/alebrotto
+
+# Remover tudo
+rm -rf Mega-Sena-Hacker
+
+# Restaurar backup
+cp -r Mega-Sena-Hacker.backup.YYYYMMDD_HHMMSS Mega-Sena-Hacker
+
+# Recomeçar do zero
+cd Mega-Sena-Hacker
+
+# ========================================================================
+# 9. VERIFICAR SE ARQUIVOS ESTÃO NO LUGAR
+# ========================================================================
+
+# Ver se mega_analyzer está em Downloads
+ls -la ~/Downloads/mega_analyzer/
+
+# Se não estiver, procurar
+find ~/Downloads -name "lottery_analyzer.py" 2>/dev/null
+
+# Ou procurar em todo sistema (último recurso)
+find ~ -name "lottery_analyzer.py" 2>/dev/null
+
+# ========================================================================
+# 10. CRIAR .gitignore MANUALMENTE
+# ========================================================================
+
+cd /Users/alebrotto/Mega-Sena-Hacker
+
+cat > .gitignore << 'EOF'
+__pycache__/
+*.py[cod]
+*.xlsx
+*.csv
+*.json
+venv/
+.vscode/
+.DS_Store
+outputs/
+*.png
+*.pdf
+EOF
+
+# ========================================================================
+# 11. PUSH FORÇADO (ÚLTIMO RECURSO)
+# ========================================================================
+
+cd /Users/alebrotto/Mega-Sena-Hacker
+
+git add .
+git commit -m "🎲 Mega Analyzer v2.0"
+git push origin main --force
+
+# ========================================================================
+# 12. VERIFICAR CONECTIVIDADE GITHUB
+# ========================================================================
+
+cd /Users/alebrotto/Mega-Sena-Hacker
+
+# Ver remotes
+git remote -v
+
+# Testar conexão
+git fetch origin
+
+# Reconfigurar remote (se necessário)
+git remote remove origin
+git remote add origin https://github.com/SEU_USUARIO/Mega-Sena-Hacker.git
+
+# ========================================================================
+# 13. LISTAR TUDO QUE FOI COPIADO
+# ========================================================================
+
+cd /Users/alebrotto/Mega-Sena-Hacker
+
+# Ver arquivos
+ls -lah
+
+# Ver em formato tree (se tiver instalado)
+tree -a -L 2
+
+# Ou fazer tree manual
+find . -maxdepth 2 -name "*" | sort
+
+# ========================================================================
+# 14. COMPARAR ANTES E DEPOIS
+# ========================================================================
+
+# Tamanho do backup
+du -sh /Users/alebrotto/Mega-Sena-Hacker.backup.*
+
+# Tamanho do novo
+du -sh /Users/alebrotto/Mega-Sena-Hacker
+
+# Diferença de arquivos
+diff -r /Users/alebrotto/Mega-Sena-Hacker.backup.* /Users/alebrotto/Mega-Sena-Hacker | head -20
+
+# ========================================================================
+# FIM
+# ========================================================================

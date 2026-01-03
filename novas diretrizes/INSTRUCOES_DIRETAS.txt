@@ -1,0 +1,149 @@
+# ⚡ INSTRUÇÕES DIRETAS - CLAUDE CODE CLI
+
+## 🎯 O QUE FAZER (PASSO A PASSO)
+
+### **PASSO 1: Baixar arquivos do Claude**
+```
+1. Baixe todos os arquivos do mega_analyzer
+2. Salve em: ~/Downloads/mega_analyzer/
+3. Confirme que tem 9 arquivos lá
+```
+
+### **PASSO 2: Abrir Terminal**
+```bash
+cmd + espaço
+Digite: Terminal
+Enter
+```
+
+### **PASSO 3: Iniciar Claude Code**
+```bash
+claude-code
+```
+
+### **PASSO 4: Copiar e Colar o Prompt**
+```
+1. Abra o arquivo: PROMPT_CLAUDE_CODE.txt
+2. Copie TUDO (cmd+A, cmd+C)
+3. Cole no Claude Code (cmd+V)
+4. Pressione Enter
+5. PRONTO! Claude Code faz tudo sozinho
+```
+
+---
+
+## 📝 O PROMPT (COPIE ISTO)
+
+```
+Preciso migrar o projeto Mega Analyzer v2.0 para o repositório Git existente.
+
+SITUAÇÃO:
+- Arquivos novos: ~/Downloads/mega_analyzer/
+- Projeto antigo: /Users/alebrotto/Mega-Sena-Hacker
+- Objetivo: Substituir tudo, manter histórico Git
+
+EXECUTE ESTAS TAREFAS:
+
+1. BACKUP
+   cd /Users/alebrotto
+   cp -r Mega-Sena-Hacker Mega-Sena-Hacker.backup.$(date +%Y%m%d_%H%M%S)
+   echo "✅ Backup criado"
+
+2. BRANCH DE BACKUP
+   cd /Users/alebrotto/Mega-Sena-Hacker
+   git checkout -b v1-backup
+   git add -A
+   git commit -m "Backup antes migração v2.0" || true
+   git checkout main
+   echo "✅ Branch v1-backup criada"
+
+3. LIMPAR PROJETO (MANTER .git)
+   find . -maxdepth 1 ! -name '.git' ! -name '.' ! -name '..' -exec rm -rf {} +
+   echo "✅ Projeto limpo"
+
+4. COPIAR ARQUIVOS NOVOS
+   cp -r ~/Downloads/mega_analyzer/* .
+   cp ~/Downloads/mega_analyzer/.gitignore . 2>/dev/null || true
+   chmod +x migrar_projeto.sh 2>/dev/null || true
+   echo "✅ Arquivos copiados"
+   ls -la
+
+5. INSTALAR DEPENDÊNCIAS
+   pip3 install -r requirements.txt --break-system-packages
+   echo "✅ Dependências instaladas"
+
+6. COMMIT
+   git add -A
+   git commit -m "🎲 Mega Analyzer v2.0 - Reescrita completa
+
+- Nova arquitetura modular com LotteryAnalyzer
+- 5 testes estatísticos implementados
+- Análise Mega-Sena (PRNG) vs Mega Millions (RNG)
+- Análise Mega da Virada 2025
+- Sistema de classificação automática
+- Documentação completa"
+   
+   echo "✅ Commit realizado"
+
+7. RELATÓRIO FINAL
+   echo "╔═══════════════════════════════════════╗"
+   echo "║   ✅ MIGRAÇÃO CONCLUÍDA!              ║"
+   echo "╚═══════════════════════════════════════╝"
+   echo ""
+   echo "📊 Status:"
+   git status
+   echo ""
+   echo "📝 Último commit:"
+   git log -1 --oneline
+   echo ""
+   echo "📁 Estrutura:"
+   ls -la
+   echo ""
+   echo "🚀 PRÓXIMO PASSO: git push origin main"
+
+Execute e me mostre o resultado de cada etapa.
+```
+
+---
+
+## ✅ O QUE VOCÊ VAI VER
+
+Claude Code vai executar automaticamente:
+1. ✅ Criar backup
+2. ✅ Criar branch v1-backup
+3. ✅ Limpar projeto
+4. ✅ Copiar arquivos
+5. ✅ Instalar dependências
+6. ✅ Fazer commit
+7. ✅ Mostrar relatório
+
+---
+
+## 🎯 APÓS CLAUDE CODE TERMINAR
+
+```bash
+# 1. Testar
+cd /Users/alebrotto/Mega-Sena-Hacker
+python3 exemplo_analise_completa.py
+
+# 2. Push
+git push origin main
+
+# 3. Verificar no GitHub
+```
+
+---
+
+## ⚠️ SE DER ERRO
+
+```bash
+# Restaurar backup
+rm -rf /Users/alebrotto/Mega-Sena-Hacker
+cp -r /Users/alebrotto/Mega-Sena-Hacker.backup.* /Users/alebrotto/Mega-Sena-Hacker
+
+# Tentar de novo
+```
+
+---
+
+**É ISSO! Copie o prompt acima, cole no Claude Code, e ele faz tudo! 🚀**

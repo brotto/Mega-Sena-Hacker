@@ -1,0 +1,131 @@
+# ========================================================================
+# PROMPT PARA CLAUDE CODE CLI - MIGRAÇÃO MEGA ANALYZER v2.0
+# ========================================================================
+# 
+# INSTRUÇÕES:
+# 1. Copie TUDO abaixo (do INÍCIO ao FIM)
+# 2. Abra o terminal no Mac Mini
+# 3. Execute: claude-code
+# 4. Cole este prompt completo
+# 5. Pressione Enter e deixe o Claude Code trabalhar!
+# 
+# ========================================================================
+
+Olá! Preciso que você faça a migração completa do projeto Mega Analyzer v2.0.
+
+CONTEXTO:
+--------
+Tenho um projeto Python de análise estatística de loterias que precisa ser migrado para um repositório Git existente. Os arquivos novos estão em ~/Downloads/mega_analyzer/ e o projeto antigo está em /Users/alebrotto/Mega-Sena-Hacker.
+
+OBJETIVO:
+---------
+Substituir completamente o conteúdo do projeto antigo pelos arquivos novos, mantendo o histórico Git e fazendo backup de segurança.
+
+ARQUIVOS FONTE (novos):
+----------------------
+Localizados em: ~/Downloads/mega_analyzer/
+- lottery_analyzer.py (CORE do sistema)
+- exemplo_analise_completa.py
+- analise_mega_virada_2025.py
+- README.md
+- GUIA_MIGRACAO.md
+- requirements.txt
+- .gitignore
+- migrar_projeto.sh
+
+DESTINO:
+--------
+Repositório: /Users/alebrotto/Mega-Sena-Hacker
+
+TAREFAS A EXECUTAR:
+------------------
+
+1. CRIAR BACKUP DE SEGURANÇA
+   - Copiar /Users/alebrotto/Mega-Sena-Hacker para Mega-Sena-Hacker.backup.YYYYMMDD_HHMMSS
+   - Confirmar que backup foi criado com sucesso
+
+2. SALVAR ESTADO ATUAL NO GIT
+   - Navegar para /Users/alebrotto/Mega-Sena-Hacker
+   - Criar branch de backup: git checkout -b v1-backup
+   - Adicionar e commitar tudo: git add -A && git commit -m "Backup antes migração v2.0"
+   - Voltar para main: git checkout main
+
+3. LIMPAR PROJETO (MANTER .git)
+   - Remover TODOS os arquivos e diretórios do projeto
+   - EXCETO o diretório .git (muito importante!)
+   - Use: find . -maxdepth 1 ! -name '.git' ! -name '.' ! -name '..' -exec rm -rf {} +
+
+4. COPIAR NOVOS ARQUIVOS
+   - Copiar TODOS os arquivos de ~/Downloads/mega_analyzer/ para /Users/alebrotto/Mega-Sena-Hacker/
+   - Incluir arquivos ocultos (.gitignore)
+   - Listar arquivos copiados para confirmação
+
+5. AJUSTAR PERMISSÕES
+   - Tornar migrar_projeto.sh executável: chmod +x migrar_projeto.sh
+
+6. INSTALAR DEPENDÊNCIAS
+   - Executar: pip3 install -r requirements.txt --break-system-packages
+   - Se falhar, apenas reportar (não bloquear migração)
+
+7. COMMIT DAS MUDANÇAS
+   - git add -A
+   - git commit com a seguinte mensagem:
+
+   """
+   🎲 Mega Analyzer v2.0 - Reescrita completa
+
+   - Nova arquitetura modular com LotteryAnalyzer
+   - 5 testes estatísticos implementados (Chi², Runs, Cobertura, CV, Razão Q/S)
+   - Análise comparativa: Mega-Sena (PRNG) vs Mega Millions (RNG)
+   - Análise específica Mega da Virada 2025 com anomalias documentadas
+   - Sistema de classificação automática PRNG vs RNG
+   - Documentação completa e guias de uso
+   - Scripts de migração e exemplos funcionais
+   - Descobertas: Mega-Sena apresenta comportamento PRNG confirmado
+   """
+
+8. VERIFICAÇÕES FINAIS
+   - Listar estrutura final do projeto (tree ou ls -la)
+   - Verificar status do Git: git status
+   - Mostrar último commit: git log -1 --stat
+   - Confirmar que .git está intacto
+
+9. RELATÓRIO FINAL
+   Gerar relatório mostrando:
+   - ✅ Backup criado em: [caminho]
+   - ✅ Branch v1-backup criada
+   - ✅ Arquivos antigos removidos
+   - ✅ Novos arquivos copiados: [quantidade]
+   - ✅ Dependências instaladas: [sucesso/falha]
+   - ✅ Commit realizado: [hash]
+   - 📊 Estrutura final do projeto
+   - 🚀 Próximo passo: git push origin main
+
+IMPORTANTE - NÃO FAZER:
+-----------------------
+❌ NÃO fazer push para GitHub (deixar para eu fazer manualmente)
+❌ NÃO remover o diretório .git
+❌ NÃO modificar o conteúdo dos arquivos novos
+❌ NÃO prosseguir se backup falhar
+
+TRATAMENTO DE ERROS:
+-------------------
+- Se qualquer passo falhar, PARAR imediatamente
+- Reportar erro detalhadamente
+- Não prosseguir para próximas etapas
+- Manter backup seguro
+
+CONFIRMAÇÕES NECESSÁRIAS:
+------------------------
+Antes de começar, confirme comigo:
+1. Você encontrou os arquivos em ~/Downloads/mega_analyzer/ ?
+2. O diretório /Users/alebrotto/Mega-Sena-Hacker existe?
+3. Há um repositório Git (.git) no projeto antigo?
+
+Após confirmar, execute todas as tarefas e me apresente o relatório final.
+
+Pronto para começar?
+
+# ========================================================================
+# FIM DO PROMPT
+# ========================================================================

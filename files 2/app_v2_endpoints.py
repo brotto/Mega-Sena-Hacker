@@ -25,40 +25,38 @@ def get_analyzer_with_data():
     except ImportError as e:
         logger.error(f"Erro ao importar LotteryAnalyzer: {e}")
         raise ImportError("Módulo v2.core.lottery_analyzer não encontrado. Verifique a instalação.")
-
+    
     config = Config()
     db = Database()
-
+    
     try:
         # Buscar TODOS os resultados do banco (ordenados por concurso)
-        # IMPORTANTE: Filtrar concurso > 0 para remover dados de lixo
         schema = config.DB_SCHEMA
         table = config.DB_TABLE
-        query = f'SELECT * FROM "{schema}".{table} WHERE concurso > 0 ORDER BY concurso'
+        query = f'SELECT * FROM "{schema}".{table} ORDER BY concurso'
         results = db.execute_query(query)
-
+        
         if not results:
             raise ValueError("Nenhum dado disponível no banco de dados")
-
+        
         # Criar DataFrame pandas
         df = pd.DataFrame(results)
-
+        
         # Criar analyzer
         analyzer = LotteryAnalyzer("Mega-Sena")
-
+        
         # Definir colunas das bolas
         ball_columns = ['bola1', 'bola2', 'bola3', 'bola4', 'bola5', 'bola6']
-
+        
         # Carregar dados no analyzer
         analyzer.df = df
         analyzer.ball_columns = ball_columns
-        analyzer.n_balls = len(ball_columns)  # CRITICAL: Necessário para coverage_speed_test
         analyzer.n_draws = len(df)
-
+        
         logger.info(f"✅ Analyzer criado com {analyzer.n_draws} sorteios")
-
+        
         return analyzer
-
+        
     except Exception as e:
         logger.error(f"Erro ao criar analyzer: {str(e)}")
         raise
@@ -75,10 +73,10 @@ def register_v2_routes(app):
     Registra todos os 7 novos endpoints v2.0 no Flask app
     Chamado do app.py principal
     """
-
+    
     logger.info("🚀 Iniciando registro de endpoints v2.0...")
-
-
+    
+    
     # ==========================================
     # ENDPOINT 1: TESTE DE RUNS
     # ==========================================
@@ -91,11 +89,11 @@ def register_v2_routes(app):
         try:
             analyzer = get_analyzer_with_data()
             result = analyzer.runs_test()
-
+            
             # Determinar classificação e nível de suspeita
             z_score = result.get('z_score', 0)
             classificacao = 'PRNG' if abs(z_score) > 10 else 'RNG'
-
+            
             if abs(z_score) > 30:
                 nivel_suspeita = 'CRÍTICO'
             elif abs(z_score) > 10:
@@ -104,7 +102,7 @@ def register_v2_routes(app):
                 nivel_suspeita = 'MODERADO'
             else:
                 nivel_suspeita = 'BAIXO'
-
+            
             response = {
                 'metodo': 'Teste de Runs (Wald-Wolfowitz)',
                 'descricao': 'Detecta padrões de agrupamento não-aleatório nas sequências',
@@ -117,15 +115,15 @@ def register_v2_routes(app):
                     'explicacao': f'Z-score de {z_score:.2f} indica comportamento {classificacao}'
                 }
             }
-
+            
             logger.info(f"✅ Runs test executado: Z={z_score:.2f}")
             return jsonify(response), 200
-
+            
         except Exception as e:
             logger.error(f"❌ Erro em runs_test_v2: {str(e)}")
             return jsonify({'error': str(e)}), 500
-
-
+    
+    
     # ==========================================
     # ENDPOINT 2: VELOCIDADE DE COBERTURA
     # ==========================================
@@ -138,11 +136,11 @@ def register_v2_routes(app):
         try:
             analyzer = get_analyzer_with_data()
             result = analyzer.coverage_speed_test(n_possible=60)
-
+            
             # Determinar classificação
             diff_pct = abs(result.get('percentage_difference', 0))
             classificacao = 'PRNG' if diff_pct > 50 else 'RNG'
-
+            
             if diff_pct > 70:
                 nivel_suspeita = 'CRÍTICO'
             elif diff_pct > 50:
@@ -151,7 +149,7 @@ def register_v2_routes(app):
                 nivel_suspeita = 'MODERADO'
             else:
                 nivel_suspeita = 'BAIXO'
-
+            
             response = {
                 'metodo': 'Velocidade de Cobertura (Coupon Collector)',
                 'descricao': 'Analisa quão rápido todos os números aparecem pela primeira vez',
@@ -165,15 +163,15 @@ def register_v2_routes(app):
                     'explicacao': f'Cobertura {diff_pct:.1f}% {"mais rápida" if result.get("percentage_difference", 0) < 0 else "mais lenta"} que esperado'
                 }
             }
-
+            
             logger.info(f"✅ Coverage test executado: {diff_pct:.1f}% diferença")
             return jsonify(response), 200
-
+            
         except Exception as e:
             logger.error(f"❌ Erro em coverage_speed_v2: {str(e)}")
             return jsonify({'error': str(e)}), 500
-
-
+    
+    
     # ==========================================
     # ENDPOINT 3: COEFICIENTE DE VARIAÇÃO
     # ==========================================
@@ -186,11 +184,11 @@ def register_v2_routes(app):
         try:
             analyzer = get_analyzer_with_data()
             result = analyzer.coefficient_variation_evolution()
-
+            
             # Determinar classificação
             std_cv = result.get('std_cv', 100)
             classificacao = 'PRNG' if std_cv < 3 else 'RNG'
-
+            
             if std_cv < 2:
                 nivel_suspeita = 'CRÍTICO'
             elif std_cv < 3:
@@ -199,7 +197,7 @@ def register_v2_routes(app):
                 nivel_suspeita = 'MODERADO'
             else:
                 nivel_suspeita = 'BAIXO'
-
+            
             response = {
                 'metodo': 'Evolução do Coeficiente de Variação',
                 'descricao': 'Analisa estabilidade temporal das frequências ao longo do tempo',
@@ -212,15 +210,15 @@ def register_v2_routes(app):
                     'explicacao': f'Desvio padrão de {std_cv:.2f}% indica estabilidade {"artificial" if std_cv < 3 else "natural"}'
                 }
             }
-
+            
             logger.info(f"✅ CV evolution executado: std={std_cv:.2f}%")
             return jsonify(response), 200
-
+            
         except Exception as e:
             logger.error(f"❌ Erro em cv_evolution_v2: {str(e)}")
             return jsonify({'error': str(e)}), 500
-
-
+    
+    
     # ==========================================
     # ENDPOINT 4: RELATÓRIO COMPLETO
     # ==========================================
@@ -232,17 +230,17 @@ def register_v2_routes(app):
         """
         try:
             analyzer = get_analyzer_with_data()
-
+            
             # Executar TODOS os testes
             logger.info("Executando todos os testes...")
             analyzer.chi_square_test(n_possible=60)
             analyzer.runs_test()
             analyzer.coverage_speed_test(n_possible=60)
             analyzer.coefficient_variation_evolution()
-
+            
             # Gerar relatório final
             report = analyzer.generate_final_report()
-
+            
             response = {
                 'metodo': 'Relatório Completo - Análise PRNG vs RNG',
                 'classificacao': report.get('classification'),
@@ -257,15 +255,15 @@ def register_v2_routes(app):
                 'detalhes_completos': convert_to_native_types(report),
                 'total_concursos': analyzer.n_draws
             }
-
+            
             logger.info(f"✅ Relatório completo gerado: {report.get('classification')} ({report.get('confidence')}%)")
             return jsonify(response), 200
-
+            
         except Exception as e:
             logger.error(f"❌ Erro em full_report_v2: {str(e)}")
             return jsonify({'error': str(e)}), 500
-
-
+    
+    
     # ==========================================
     # ENDPOINT 5: MEGA DA VIRADA 2025
     # ==========================================
@@ -277,10 +275,10 @@ def register_v2_routes(app):
         """
         try:
             from v2.analyzers.megavirada_analyzer import MegaDaVirada2025Analyzer
-
+            
             analyzer = MegaDaVirada2025Analyzer()
-            report = analyzer.relatorio_completo()
-
+            report = analyzer.gerar_relatorio_completo()
+            
             response = {
                 'metodo': 'Análise Mega da Virada 2025',
                 'descricao': 'Análise detalhada das anomalias da Virada 2025',
@@ -298,10 +296,10 @@ def register_v2_routes(app):
                     'razao_esperada': 324
                 }
             }
-
+            
             logger.info("✅ Análise Mega Virada 2025 executada")
             return jsonify(response), 200
-
+            
         except ImportError:
             logger.warning("MegaDaVirada2025Analyzer não disponível")
             return jsonify({
@@ -311,8 +309,8 @@ def register_v2_routes(app):
         except Exception as e:
             logger.error(f"❌ Erro em mega_virada_2025_v2: {str(e)}")
             return jsonify({'error': str(e)}), 500
-
-
+    
+    
     # ==========================================
     # ENDPOINT 6: ANÁLISE COMPARATIVA
     # ==========================================
@@ -330,7 +328,7 @@ def register_v2_routes(app):
             ms_analyzer.coverage_speed_test(n_possible=60)
             ms_analyzer.coefficient_variation_evolution()
             ms_report = ms_analyzer.generate_final_report()
-
+            
             response = {
                 'metodo': 'Análise Comparativa PRNG vs RNG',
                 'mega_sena': {
@@ -363,15 +361,15 @@ def register_v2_routes(app):
                     'recomendacao': 'Auditoria independente recomendada'
                 }
             }
-
+            
             logger.info("✅ Análise comparativa executada")
             return jsonify(response), 200
-
+            
         except Exception as e:
             logger.error(f"❌ Erro em comparative_v2: {str(e)}")
             return jsonify({'error': str(e)}), 500
-
-
+    
+    
     # ==========================================
     # ENDPOINT 7: CLASSIFICAÇÃO AUTOMÁTICA
     # ==========================================
@@ -383,16 +381,15 @@ def register_v2_routes(app):
         """
         try:
             analyzer = get_analyzer_with_data()
-
-            # Executar testes essenciais (4 testes principais)
+            
+            # Executar testes essenciais
             logger.info("Executando testes essenciais...")
             analyzer.chi_square_test(n_possible=60)
             analyzer.runs_test()
             analyzer.coverage_speed_test(n_possible=60)
-            analyzer.coefficient_variation_evolution()  # CRITICAL: Adiciona teste CV
-
+            
             report = analyzer.generate_final_report()
-
+            
             # Determinar nível de confiança em texto
             confidence = report.get('confidence', 0)
             if confidence >= 80:
@@ -403,44 +400,38 @@ def register_v2_routes(app):
                 nivel_confianca = 'Moderada'
             else:
                 nivel_confianca = 'Baixa'
-
+            
             # Determinar recomendação
             classificacao = report.get('classification')
-            if 'PRNG' in classificacao and 'Provável' not in classificacao:
+            if classificacao == 'PRNG':
                 recomendacao = 'Auditoria independente URGENTE recomendada'
-            elif 'PRNG Provável' in classificacao or 'Possivelmente PRNG' in classificacao:
+            elif classificacao == 'PRNG Provável':
                 recomendacao = 'Investigação adicional recomendada'
-            elif 'RNG' in classificacao:
-                recomendacao = 'Sistema compatível com RNG verdadeiro'
             else:
-                recomendacao = 'Dados insuficientes para conclusão definitiva'
-
-            # Extrair anomalias de suspect_counts
-            suspect_counts = report.get('suspect_counts', {})
-
+                recomendacao = 'Sistema dentro do esperado para RNG'
+            
             response = {
                 'classificacao': classificacao,
                 'confianca': f"{confidence}%",
                 'nivel_confianca': nivel_confianca,
                 'resumo_executivo': report.get('summary'),
                 'anomalias_detectadas': {
-                    'criticas': suspect_counts.get('CRÍTICO', 0),
-                    'altas': suspect_counts.get('ALTO', 0),
-                    'moderadas': suspect_counts.get('MODERADO', 0),
-                    'baixas': suspect_counts.get('BAIXO', 0)
+                    'criticas': report.get('critical_anomalies', 0),
+                    'altas': report.get('high_anomalies', 0),
+                    'moderadas': report.get('moderate_anomalies', 0)
                 },
                 'recomendacao': recomendacao,
                 'total_concursos_analisados': analyzer.n_draws
             }
-
+            
             logger.info(f"✅ Classificação executada: {classificacao} ({confidence}%)")
             return jsonify(response), 200
-
+            
         except Exception as e:
             logger.error(f"❌ Erro em classification_v2: {str(e)}")
             return jsonify({'error': str(e)}), 500
-
-
+    
+    
     logger.info("✅ Todos os 7 endpoints v2.0 registrados com sucesso!")
     logger.info("   - /v2/runs-test")
     logger.info("   - /v2/coverage-speed")
