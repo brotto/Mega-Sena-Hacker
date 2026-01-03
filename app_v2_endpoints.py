@@ -52,6 +52,7 @@ def get_analyzer_with_data():
         # Carregar dados no analyzer
         analyzer.df = df
         analyzer.ball_columns = ball_columns
+        analyzer.n_balls = len(ball_columns)  # CRITICAL: Necessário para coverage_speed_test
         analyzer.n_draws = len(df)
 
         logger.info(f"✅ Analyzer criado com {analyzer.n_draws} sorteios")
