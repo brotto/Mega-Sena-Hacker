@@ -441,7 +441,264 @@ def register_v2_routes(app):
             return jsonify({'error': str(e)}), 500
 
 
-    logger.info("✅ Todos os 7 endpoints v2.0 registrados com sucesso!")
+    # ==========================================
+    # ENDPOINT 8: ANÁLISE COMPLETA (n8n format)
+    # ==========================================
+    @app.route('/v2/analise-completa', methods=['GET', 'POST'])
+    def analise_completa_v2():
+        """
+        Análise Completa - Formato otimizado para n8n/WhatsApp
+        Chama full-report internamente e formata para integração
+        """
+        try:
+            from datetime import datetime
+
+            analyzer = get_analyzer_with_data()
+
+            # Executar TODOS os testes
+            logger.info("🔬 Executando análise completa para n8n...")
+            analyzer.chi_square_test(n_possible=60)
+            analyzer.runs_test()
+            analyzer.coverage_speed_test(n_possible=60)
+            analyzer.coefficient_variation_evolution()
+
+            # Gerar relatório final
+            report = analyzer.generate_final_report()
+
+            # Extrair dados dos testes
+            suspect_counts = report.get('suspect_counts', {})
+
+            # Determinar emoji baseado na classificação
+            classificacao = report.get('classification', 'INCONCLUSIVO')
+            if 'PRNG' in classificacao:
+                emoji_status = "🚨"
+                status_texto = "ALERTA"
+            elif 'RNG' in classificacao:
+                emoji_status = "✅"
+                status_texto = "NORMAL"
+            else:
+                emoji_status = "⚠️"
+                status_texto = "INCONCLUSIVO"
+
+            # Formato otimizado para n8n/WhatsApp
+            response = {
+                'status': 'success',
+                'timestamp': datetime.now().isoformat(),
+                'metadata': {
+                    'versao': '2.0',
+                    'fonte': 'Mega-Sena-Hacker API',
+                    'total_concursos': analyzer.n_draws,
+                    'ultimo_concurso': int(analyzer.df['concurso'].max()) if 'concurso' in analyzer.df.columns else None
+                },
+                'resultado': {
+                    'status_emoji': emoji_status,
+                    'status_texto': status_texto,
+                    'classificacao': classificacao,
+                    'confianca': report.get('confidence', 0),
+                    'confianca_texto': f"{report.get('confidence', 0)}%"
+                },
+                'anomalias': {
+                    'total': sum(suspect_counts.values()) if suspect_counts else 0,
+                    'criticas': suspect_counts.get('CRÍTICO', 0),
+                    'altas': suspect_counts.get('ALTO', 0),
+                    'moderadas': suspect_counts.get('MODERADO', 0),
+                    'baixas': suspect_counts.get('BAIXO', 0)
+                },
+                'resumo': report.get('summary', 'Análise não disponível'),
+                'testes_executados': report.get('tests_run', []),
+                'recomendacao': 'Auditoria independente recomendada' if 'PRNG' in classificacao else 'Monitoramento contínuo',
+                'formato_whatsapp': f"""
+{emoji_status} *ANÁLISE MEGA-SENA*
+━━━━━━━━━━━━━━━━━━━━
+📊 *Status:* {status_texto}
+🎯 *Classificação:* {classificacao}
+📈 *Confiança:* {report.get('confidence', 0)}%
+━━━━━━━━━━━━━━━━━━━━
+🔍 *Anomalias Detectadas:*
+  🔴 Críticas: {suspect_counts.get('CRÍTICO', 0)}
+  🟠 Altas: {suspect_counts.get('ALTO', 0)}
+  🟡 Moderadas: {suspect_counts.get('MODERADO', 0)}
+  🟢 Baixas: {suspect_counts.get('BAIXO', 0)}
+━━━━━━━━━━━━━━━━━━━━
+📝 *Concursos analisados:* {analyzer.n_draws}
+⏰ *Atualizado:* {datetime.now().strftime('%d/%m/%Y %H:%M')}
+"""
+            }
+
+            logger.info(f"✅ Análise completa executada: {classificacao}")
+            return jsonify(response), 200
+
+        except Exception as e:
+            logger.error(f"❌ Erro em analise_completa_v2: {str(e)}")
+            return jsonify({
+                'status': 'error',
+                'error': str(e),
+                'formato_whatsapp': f"❌ *ERRO NA ANÁLISE*\n{str(e)}"
+            }), 500
+
+
+    # ==========================================
+    # ENDPOINT 9: PREDIÇÃO DE PRÓXIMOS NÚMEROS
+    # ==========================================
+    @app.route('/v2/predict-next', methods=['GET', 'POST'])
+    def predict_next_v2():
+        """
+        Predição de Próximos Números
+        Gera 3 estratégias: anti_popular, prng_tracker, hibrida
+        Baseado nos últimos 500 concursos com backtesting
+        """
+        try:
+            from datetime import datetime
+            import numpy as np
+            from collections import Counter
+
+            config = Config()
+            db = Database()
+
+            try:
+                # Buscar últimos 500 concursos
+                schema = config.DB_SCHEMA
+                table = config.DB_TABLE
+                query = f'''
+                    SELECT concurso, bola1, bola2, bola3, bola4, bola5, bola6
+                    FROM "{schema}".{table}
+                    WHERE concurso > 0
+                    ORDER BY concurso DESC
+                    LIMIT 500
+                '''
+                results = db.execute_query(query)
+
+                if not results or len(results) < 100:
+                    raise ValueError("Dados insuficientes para predição (mínimo 100 concursos)")
+
+                df = pd.DataFrame(results)
+                ball_columns = ['bola1', 'bola2', 'bola3', 'bola4', 'bola5', 'bola6']
+
+                # Extrair todos os números sorteados
+                all_numbers = []
+                for col in ball_columns:
+                    all_numbers.extend(df[col].tolist())
+
+                # Contagem de frequências
+                freq = Counter(all_numbers)
+
+                # ========================================
+                # ESTRATÉGIA 1: ANTI-POPULAR
+                # Números menos sorteados (evitar os "quentes")
+                # ========================================
+                menos_frequentes = [num for num, _ in freq.most_common()[-20:]]
+                anti_popular = sorted(np.random.choice(menos_frequentes, 6, replace=False).tolist())
+
+                # ========================================
+                # ESTRATÉGIA 2: PRNG TRACKER
+                # Baseado em padrões detectados no PRNG
+                # Números que "deveriam" sair para equalizar
+                # ========================================
+                media_esperada = len(all_numbers) / 60
+                defasados = [(num, media_esperada - freq.get(num, 0)) for num in range(1, 61)]
+                defasados.sort(key=lambda x: x[1], reverse=True)
+                candidatos_prng = [num for num, _ in defasados[:15]]
+                prng_tracker = sorted(np.random.choice(candidatos_prng, 6, replace=False).tolist())
+
+                # ========================================
+                # ESTRATÉGIA 3: HÍBRIDA
+                # Mix de anti-popular + prng + aleatoriedade
+                # ========================================
+                pool_hibrido = list(set(menos_frequentes[:10] + candidatos_prng[:10]))
+                if len(pool_hibrido) < 6:
+                    pool_hibrido = list(range(1, 61))
+                hibrida = sorted(np.random.choice(pool_hibrido, 6, replace=False).tolist())
+
+                # ========================================
+                # BACKTESTING SIMPLES
+                # Verifica acertos nos últimos 50 concursos
+                # ========================================
+                ultimos_50 = df.head(50)
+
+                def calcular_acertos(predicao, df_teste):
+                    acertos = {'0': 0, '1': 0, '2': 0, '3': 0, '4': 0, '5': 0, '6': 0}
+                    for _, row in df_teste.iterrows():
+                        numeros_sorteados = set([row[col] for col in ball_columns])
+                        hits = len(set(predicao) & numeros_sorteados)
+                        acertos[str(hits)] += 1
+                    return acertos
+
+                # Calcular acertos para cada estratégia (simulação)
+                backtest_anti = calcular_acertos(anti_popular, ultimos_50)
+                backtest_prng = calcular_acertos(prng_tracker, ultimos_50)
+                backtest_hibrida = calcular_acertos(hibrida, ultimos_50)
+
+                ultimo_concurso = int(df['concurso'].max())
+                proximo_concurso = ultimo_concurso + 1
+
+                response = {
+                    'status': 'success',
+                    'timestamp': datetime.now().isoformat(),
+                    'metadata': {
+                        'concursos_analisados': len(df),
+                        'ultimo_concurso': ultimo_concurso,
+                        'proximo_concurso': proximo_concurso,
+                        'versao_modelo': '2.0'
+                    },
+                    'predicoes': {
+                        'anti_popular': {
+                            'numeros': anti_popular,
+                            'descricao': 'Números menos frequentes nos últimos 500 concursos',
+                            'estrategia': 'Evita números "quentes" que já saíram muito',
+                            'backtesting': backtest_anti
+                        },
+                        'prng_tracker': {
+                            'numeros': prng_tracker,
+                            'descricao': 'Números defasados que o PRNG deve equalizar',
+                            'estrategia': 'Explora padrão de equalização artificial detectado',
+                            'backtesting': backtest_prng
+                        },
+                        'hibrida': {
+                            'numeros': hibrida,
+                            'descricao': 'Combinação das estratégias anti-popular e PRNG',
+                            'estrategia': 'Maximiza chances combinando múltiplos fatores',
+                            'backtesting': backtest_hibrida
+                        }
+                    },
+                    'aviso': '⚠️ Estas predições são experimentais e baseadas em análise estatística. Jogar na loteria envolve risco.',
+                    'formato_whatsapp': f"""
+🎰 *PREDIÇÕES MEGA-SENA*
+━━━━━━━━━━━━━━━━━━━━
+📍 *Próximo Concurso:* {proximo_concurso}
+
+🎯 *Estratégia Anti-Popular:*
+{' - '.join(map(str, anti_popular))}
+
+🔬 *Estratégia PRNG Tracker:*
+{' - '.join(map(str, prng_tracker))}
+
+⚡ *Estratégia Híbrida:*
+{' - '.join(map(str, hibrida))}
+
+━━━━━━━━━━━━━━━━━━━━
+📊 Baseado em {len(df)} concursos
+⏰ {datetime.now().strftime('%d/%m/%Y %H:%M')}
+
+⚠️ _Predições experimentais_
+"""
+                }
+
+                logger.info(f"✅ Predições geradas para concurso {proximo_concurso}")
+                return jsonify(response), 200
+
+            finally:
+                db.disconnect()
+
+        except Exception as e:
+            logger.error(f"❌ Erro em predict_next_v2: {str(e)}")
+            return jsonify({
+                'status': 'error',
+                'error': str(e),
+                'formato_whatsapp': f"❌ *ERRO NA PREDIÇÃO*\n{str(e)}"
+            }), 500
+
+
+    logger.info("✅ Todos os 9 endpoints v2.0 registrados com sucesso!")
     logger.info("   - /v2/runs-test")
     logger.info("   - /v2/coverage-speed")
     logger.info("   - /v2/coefficient-variation")
@@ -449,3 +706,5 @@ def register_v2_routes(app):
     logger.info("   - /v2/mega-virada-2025")
     logger.info("   - /v2/comparative-analysis")
     logger.info("   - /v2/classification")
+    logger.info("   - /v2/analise-completa")
+    logger.info("   - /v2/predict-next")
