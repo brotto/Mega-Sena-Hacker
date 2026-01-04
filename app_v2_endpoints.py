@@ -559,6 +559,17 @@ def register_v2_routes(app):
                 # Buscar últimos 500 concursos
                 schema = config.DB_SCHEMA
                 table = config.DB_TABLE
+                
+                # CRITICAL FIX: Buscar MAX(concurso) primeiro
+                query_max = f'''
+                    SELECT MAX(concurso) as max_concurso
+                    FROM "{schema}".{table}
+                    WHERE concurso > 0
+                '''
+                result_max = db.execute_query(query_max)
+                ultimo_concurso_real = int(result_max[0]['max_concurso'])
+                proximo_concurso_real = ultimo_concurso_real + 1
+                
                 query = f'''
                     SELECT concurso, bola1, bola2, bola3, bola4, bola5, bola6
                     FROM "{schema}".{table}
@@ -628,8 +639,8 @@ def register_v2_routes(app):
                 backtest_prng = calcular_acertos(prng_tracker, ultimos_50)
                 backtest_hibrida = calcular_acertos(hibrida, ultimos_50)
 
-                ultimo_concurso = int(df['concurso'].max())
-                proximo_concurso = ultimo_concurso + 1
+                ultimo_concurso = ultimo_concurso_real
+                proximo_concurso = proximo_concurso_real
 
                 response = {
                     'status': 'success',
